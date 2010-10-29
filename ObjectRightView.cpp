@@ -105,6 +105,8 @@ LRESULT CObjectRightView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	switch  (message)
     {
 		case WM_LBUTTONDOWN:
+		case WM_MBUTTONDOWN:
+		case WM_RBUTTONDOWN:
 			iZoomMouseX = iMouseX;
 			iZoomMouseY = iMouseY;
 			break;
