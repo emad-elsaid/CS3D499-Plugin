@@ -48,10 +48,6 @@ BEGIN
     END
     POPUP "3D View"
     BEGIN
-        MENUITEM "Zoom",                        ID_3DVIEW_ZOOM
-        MENUITEM "Rotate",                      ID_3DVIEW_ROTATE, CHECKED
-        MENUITEM "Pan",                         ID_3DVIEW_PAN
-        MENUITEM SEPARATOR
         MENUITEM "Reset Side",                  ID_3DVIEW_RESETSIDE
         MENUITEM "Reset Front",                 ID_3DVIEW_RESETFRONT
     END
@@ -264,9 +260,6 @@ BEGIN
     AFX_IDS_SCTASKLIST      "Activate Task List"
     ID_UPDATE_RIGHT_VIEW    "Update of the right window"
     ID_INIT_RIGHT_VIEW      "Initialize of the right window"
-    ID_ZOOM                 "Zoom"
-    ID_PAN                  "Pan"
-    ID_ROTATE               "Rotate"
     ID_RESET_TOP            "Reset Top"
     ID_RESET_SIDE           "Reset side"
     ID_RESET_FRONT          "Reset front"

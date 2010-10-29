@@ -36,7 +36,7 @@ extern	float	* pVertices;
 
 float	* pVerticesDeviceBuffer, counter = 0;
 bool	initialized = false;
-int		DirectXStatus = 0, render_browse_type = ID_ROTATE;
+int		DirectXStatus = 0;
 const float kCamMoveAmt = 0.002f; // Amount to move camera by
 const float kMaxAngle = 89.0f;
 D3DXVECTOR3		m_vecOrigin;
@@ -112,85 +112,84 @@ LRESULT CObjectRightView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			//
 			//	Mouse moved
 			//
-			if	(MK_LBUTTON&wParam) 
+			if	(MK_MBUTTON&wParam) 
 			{
 				//
 				//	Mouse button pressed
 				//
-				switch  (render_browse_type) {
-					case  ID_PAN:
-						vec = gCam->getCamX();
-						eye = gCam->getEye();
+				vec = gCam->getCamX();
+				eye = gCam->getEye();
 
-						eye -= vec * (((float) (iMouseX-iZoomMouseX))/200);
-						gCubePos -=  vec * (((float) (iMouseX-iZoomMouseX))/200);
+				eye -= vec * (((float) (iMouseX-iZoomMouseX))/200);
+				gCubePos -=  vec * (((float) (iMouseX-iZoomMouseX))/200);
 
-						iZoomMouseX = iMouseX;
+				iZoomMouseX = iMouseX;
 
-						gCam->setEye(eye);
-						gCam->setTarget(gCubePos); // Set the camera to look at the cube
-						//
-						vec = gCam->getCamY();
-						eye = gCam->getEye();
+				gCam->setEye(eye);
+				gCam->setTarget(gCubePos); // Set the camera to look at the cube
+				//
+				vec = gCam->getCamY();
+				eye = gCam->getEye();
 
-						eye += vec * (((float) (iMouseY-iZoomMouseY))/200);
-						gCubePos +=  vec * (((float) (iMouseY-iZoomMouseY))/200);
+				eye += vec * (((float) (iMouseY-iZoomMouseY))/200);
+				gCubePos +=  vec * (((float) (iMouseY-iZoomMouseY))/200);
 
-						iZoomMouseY = iMouseY;
+				iZoomMouseY = iMouseY;
 
-						gCam->setEye(eye);
-						gCam->setTarget(gCubePos); // Set the camera to look at the cube
-						//
-						if  (initialized) {
-							Render();
-						}
-						break;
-					case  ID_ROTATE:
-						amt = (iMouseX - iZoomMouseX) * kCamMoveAmt * 300;
-						gCam->rotY(((float) amt * 3.14159265f / 180.0f), gCubePos);
-						iZoomMouseX = iMouseX;
-
-						amt = -(iMouseY - iZoomMouseY) * kCamMoveAmt * 300;
-						// Cap pitch
-						if(pitchAmt + amt < -kMaxAngle)
-						{
-							amt = -kMaxAngle - pitchAmt;
-							pitchAmt = -kMaxAngle;
-						}
-						else if(pitchAmt + amt > kMaxAngle)
-						{
-							amt = kMaxAngle - pitchAmt;
-							pitchAmt = kMaxAngle;
-						}
-						else
-						{
-							pitchAmt += amt;
-						}
-						// Pitch the camera up/down
-						gCam->pitch(((float) amt * 3.14159265f / 180.0f), gCubePos);
-						iZoomMouseY = iMouseY;
-						if  (initialized) {
-							Render();
-						}
-						break;
-					case  ID_ZOOM:
-						vec = gCam->getCamZ();
-						eye = gCam->getEye();
-
-						eye += vec * (((float) (iMouseY-iZoomMouseY))/50);
-
-						if	(eye.z > -0.001) {
-							eye.z = -0.001f;
-						}
-						iZoomMouseY = iMouseY;
-
-						gCam->setEye(eye);
-						gCam->setTarget(gCubePos); // Set the camera to look at the cube
-						if  (initialized) {
-							Render();
-						}
-						break;
+				gCam->setEye(eye);
+				gCam->setTarget(gCubePos); // Set the camera to look at the cube
+				//
+				if  (initialized) {
+					Render();
 				}
+			}
+			else if	(MK_LBUTTON&wParam)
+			{
+				amt = (iMouseX - iZoomMouseX) * kCamMoveAmt * 300;
+				gCam->rotY(((float) amt * 3.14159265f / 180.0f), gCubePos);
+				iZoomMouseX = iMouseX;
+
+				amt = -(iMouseY - iZoomMouseY) * kCamMoveAmt * 300;
+				// Cap pitch
+				if(pitchAmt + amt < -kMaxAngle)
+				{
+					amt = -kMaxAngle - pitchAmt;
+					pitchAmt = -kMaxAngle;
+				}
+				else if(pitchAmt + amt > kMaxAngle)
+				{
+					amt = kMaxAngle - pitchAmt;
+					pitchAmt = kMaxAngle;
+				}
+				else
+				{
+					pitchAmt += amt;
+				}
+				// Pitch the camera up/down
+				gCam->pitch(((float) amt * 3.14159265f / 180.0f), gCubePos);
+				iZoomMouseY = iMouseY;
+				if  (initialized) {
+					Render();
+				}
+			}
+			else if	(MK_RBUTTON&wParam) 
+			{
+				vec = gCam->getCamZ();
+				eye = gCam->getEye();
+
+				eye += vec * (((float) (iMouseY-iZoomMouseY))/50);
+
+				if	(eye.z > -0.001) {
+					eye.z = -0.001f;
+				}
+				iZoomMouseY = iMouseY;
+
+				gCam->setEye(eye);
+				gCam->setTarget(gCubePos); // Set the camera to look at the cube
+				if  (initialized) {
+					Render();
+				}
+						
 			}
 			break;
 		case ID_RESET_FRONT:

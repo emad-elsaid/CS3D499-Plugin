@@ -38,9 +38,6 @@ IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 
 BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_CREATE()
-	ON_COMMAND(ID_3DVIEW_ZOOM, On3dviewZoom)
-	ON_COMMAND(ID_3DVIEW_PAN, On3dviewPan)
-	ON_COMMAND(ID_3DVIEW_ROTATE, On3dviewRotate)
 	ON_COMMAND(ID_3DVIEW_RESETSIDE, On3dviewResetside)
 	ON_COMMAND(ID_3DVIEW_RESETTOP, On3dviewResettop)
 	ON_COMMAND(ID_3DVIEW_RESETFRONT, On3dviewResetfront)
@@ -113,34 +110,6 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 	
 	return	true;
 }
-
-void CMainFrame::On3dviewPan() 
-{
-	GetMenu()->CheckMenuItem(ID_3DVIEW_PAN, MF_CHECKED);
-	GetMenu()->CheckMenuItem(ID_3DVIEW_ROTATE, MF_UNCHECKED);
-	GetMenu()->CheckMenuItem(ID_3DVIEW_ZOOM, MF_UNCHECKED);
-
-	render_browse_type = ID_PAN;
-}
-
-void CMainFrame::On3dviewRotate() 
-{
-	GetMenu()->CheckMenuItem(ID_3DVIEW_PAN, MF_UNCHECKED);
-	GetMenu()->CheckMenuItem(ID_3DVIEW_ROTATE, MF_CHECKED);
-	GetMenu()->CheckMenuItem(ID_3DVIEW_ZOOM, MF_UNCHECKED);
-
-	render_browse_type = ID_ROTATE;
-}
-
-void CMainFrame::On3dviewZoom() 
-{
-	GetMenu()->CheckMenuItem(ID_3DVIEW_PAN, MF_UNCHECKED);
-	GetMenu()->CheckMenuItem(ID_3DVIEW_ROTATE, MF_UNCHECKED);
-	GetMenu()->CheckMenuItem(ID_3DVIEW_ZOOM, MF_CHECKED);
-
-	render_browse_type = ID_ZOOM;
-}
-
 
 void CMainFrame::On3dviewResetside() 
 {

@@ -20,9 +20,6 @@
 #define ID_FILE_SAVEASIFCXML            32778
 #define ID_UPDATE_RIGHT_VIEW            61204
 #define ID_INIT_RIGHT_VIEW              61205
-#define ID_ZOOM                         61206
-#define ID_PAN                          61207
-#define ID_ROTATE                       61208
 #define ID_RESET_TOP                    61209
 #define ID_RESET_SIDE                   61210
 #define ID_RESET_FRONT                  61211
