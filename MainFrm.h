@@ -24,6 +24,8 @@
 #pragma once
 #endif
 
+
+
 class CMainFrame : public CFrameWnd
 {
 	

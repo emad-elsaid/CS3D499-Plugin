@@ -177,13 +177,17 @@ LRESULT CObjectRightView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			else if	(MK_RBUTTON&wParam) 
 			{
 				vec = gCam->getCamZ();
+				
 				eye = gCam->getEye();
-
+				
+				
 				eye += vec * (((float) (iMouseY-iZoomMouseY))/50);
-
-				if	(eye.z > -0.001) {
-					eye.z = -0.001f;
+				
+				if(eye.z > -0.001f) {
+					break;
 				}
+				
+					
 				iZoomMouseY = iMouseY;
 
 				gCam->setEye(eye);
