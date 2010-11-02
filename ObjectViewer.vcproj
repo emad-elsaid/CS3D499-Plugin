@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="ObjectViewer"
 	ProjectGUID="{03AE4539-4AAD-417E-99ED-9FCD9FE96F08}"
+	RootNamespace="ObjectViewer"
 	Keyword="MFCProj"
 	TargetFrameworkVersion="0"
 	>
@@ -172,10 +173,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="false"
-				AdditionalDependencies="IFCEngine.lib d3dx8dt.lib d3d8.lib"
+				AdditionalDependencies="IFCEngine.lib d3dx9.lib d3d9.lib"
 				OutputFile=".\Debug/ObjectViewer.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="&quot;D:\software\windows binaries\DirectX SDK\Include&quot;;&quot;D:\software\windows binaries\DirectX SDK\Lib\x86&quot;"
 				IgnoreDefaultLibraryNames="libci.lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/ObjectViewer.pdb"

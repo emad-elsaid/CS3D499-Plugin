@@ -24,8 +24,8 @@
 #pragma once
 #endif 
 
-#include "d3d8.h"
-#include "d3dx8.h"
+#include "d3d9.h"
+#include "d3dx9.h"
 
 #include "stdafx.h"
 #include "ObjectViewer.h"
@@ -79,9 +79,9 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 
-	LPDIRECT3D8             g_pD3D;			// Used to create the D3DDevice
-	LPDIRECT3DDEVICE8       g_pd3dDevice;	// Our rendering device
-	LPDIRECT3DVERTEXBUFFER8 g_pVB;			// Buffer to hold vertices
+	LPDIRECT3D9            g_pD3D;			// Used to create the D3DDevice
+	LPDIRECT3DDEVICE9       g_pd3dDevice;	// Our rendering device
+	LPDIRECT3DVERTEXBUFFER9 g_pVB;			// Buffer to hold vertices
 
     D3DPRESENT_PARAMETERS	d3dpp;
 

@@ -305,7 +305,7 @@ void CObjectRightView::InitializeDevice()
 		}
 
 		// Create the D3D object.
-		if( NULL == ( g_pD3D = Direct3DCreate8( D3D_SDK_VERSION ) ) ) {
+		if( NULL == ( g_pD3D = Direct3DCreate9( D3D_SDK_VERSION ) ) ) {
 			return;
 		}
 
@@ -360,13 +360,13 @@ void CObjectRightView::InitializeDeviceBuffer()
 		if	(!DirectXStatus) {
 			if( FAILED( g_pd3dDevice->CreateVertexBuffer( noIndices * sizeof(CUSTOMVERTEX),
 														  0, D3DFVF_CUSTOMVERTEX,
-														  D3DPOOL_DEFAULT, &g_pVB ) ) )
+														  D3DPOOL_DEFAULT, &g_pVB, NULL ) ) )
 			{
 				DirectXStatus = -1;
 				return;
 			}
 
-			if( FAILED( g_pVB->Lock( 0, 0, (unsigned char **)&pVerticesDeviceBuffer, 0 ) ) ) {
+			if( FAILED( g_pVB->Lock( 0, 0, (void **)&pVerticesDeviceBuffer, 0 ) ) ) {
 				DirectXStatus = -1;
 				return;
 			}
@@ -413,17 +413,16 @@ void	CObjectRightView::Render()
 			}
 
 
-			if	(g_pd3dDevice->SetStreamSource(0, g_pVB, sizeof(CUSTOMVERTEX))) {
+			if	(g_pd3dDevice->SetStreamSource(0, g_pVB, 0, sizeof(CUSTOMVERTEX))) {
 				DirectXStatus = -1;
 				return;
 			}
 
-			if	(g_pd3dDevice->SetVertexShader(D3DFVF_CUSTOMVERTEX)) {
-				DirectXStatus = -1;
-				return;
-			}
+			g_pd3dDevice->SetVertexShader(NULL);
+			g_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX);
 
-			D3DMATERIAL8	mtrl;
+
+			D3DMATERIAL9	mtrl;
 			mtrl.Diffuse.r = mtrl.Ambient.r = mtrl.Specular.r = 0.4f;
 			mtrl.Diffuse.g = mtrl.Ambient.g = mtrl.Specular.g = 0.1f;
 			mtrl.Diffuse.b = mtrl.Ambient.b = mtrl.Specular.b = 0.7f;
@@ -468,8 +467,8 @@ int	 CObjectRightView::SetupLights()
     // the rendering of our scene). However, here we are just using one. Also,
     // we need to set the D3DRS_LIGHTING renderstate to enable lighting
     D3DXVECTOR3 vecDir;
-    D3DLIGHT8 light;
-    ZeroMemory(&light, sizeof(D3DLIGHT8));
+    D3DLIGHT9 light;
+    ZeroMemory(&light, sizeof(D3DLIGHT9));
     light.Type       = D3DLIGHT_DIRECTIONAL;
 	light.Diffuse.r  = 3.4f;
 	light.Diffuse.g  = 3.4f;
@@ -501,8 +500,8 @@ int	 CObjectRightView::SetupLights()
 		return	1;
 	}
 
-    D3DLIGHT8 light1;
-    ZeroMemory(&light1, sizeof(D3DLIGHT8));
+    D3DLIGHT9 light1;
+    ZeroMemory(&light1, sizeof(D3DLIGHT9));
     light1.Type       = D3DLIGHT_DIRECTIONAL;
 	light1.Diffuse.r  = 3.4f;
 	light1.Diffuse.g  = 3.4f;
