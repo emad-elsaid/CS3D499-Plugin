@@ -179,7 +179,7 @@ LRESULT CObjectRightView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				Handle rotation according to the mouse movement only if neither the middle mouse button or
 				right mouse button is not pressed.
 			**/
-			else 
+			else if(MK_LBUTTON&wParam)
 			{
 				amt = (iMouseX - iZoomMouseX) * kCamMoveAmt * 300;
 				gCam->rotY(((float) amt * 3.14159265f / 180.0f), gCubePos);
