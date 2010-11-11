@@ -66,6 +66,7 @@ public:
 
 protected:
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	virtual BOOL PreTranslateMessage(MSG *pMSG);
 
 // Implementation
 public:
@@ -93,6 +94,10 @@ protected:
 	void	Render();
 	int		SetupLights();
 	int		SetupMatrices();
+
+private:
+	const FLOAT MULTIPLY_RATIO ;
+	
 };
 
 

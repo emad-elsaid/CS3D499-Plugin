@@ -48,10 +48,11 @@ IMPLEMENT_DYNCREATE(CObjectRightView, CFormView)
 
 BEGIN_MESSAGE_MAP(CObjectRightView, CFormView)
 	ON_WM_SIZE()
+	
 END_MESSAGE_MAP()
 
 CObjectRightView::CObjectRightView()
-	: CFormView(CObjectRightView::IDD)
+	: CFormView(CObjectRightView::IDD), MULTIPLY_RATIO(0.030f)
 {
 }
 
@@ -81,13 +82,15 @@ void CObjectRightView::OnSize(UINT nType, int cx, int cy)
 		pGroup->MapWindowPoints(this, &rc);
 
 		m_hwndRenderWindow = GetDlgItem(IDC_RENDERWINDOW)->GetSafeHwnd();
-
+		
 		InitializeDevice();
 		InitializeDeviceBuffer();
 
 		Render();
 	}
 }
+
+
 
 CPos	gCubePos(0,0,0);	// Position of cube in the world
 int		iZoomMouseX, iZoomMouseY;
@@ -101,9 +104,10 @@ LRESULT CObjectRightView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	int		iMouseX = LOWORD(lParam),
 			iMouseY = HIWORD(lParam);
 	static double pitchAmt = 0.0f;
-
+	
 	switch  (message)
     {
+		
 		case WM_LBUTTONDOWN:
 		case WM_MBUTTONDOWN:
 		case WM_RBUTTONDOWN:
@@ -114,6 +118,7 @@ LRESULT CObjectRightView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			//
 			//	Mouse moved
 			//
+			
 			if	(MK_MBUTTON&wParam) 
 			{
 				//
@@ -139,13 +144,42 @@ LRESULT CObjectRightView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				iZoomMouseY = iMouseY;
 
 				gCam->setEye(eye);
-				gCam->setTarget(gCubePos); // Set the camera to look at the cube
-				//
+				//gCam->setTarget(gCubePos); // Set the camera to look at the cube
+				
 				if  (initialized) {
 					Render();
 				}
 			}
-			else if	(MK_LBUTTON&wParam)
+			
+			else if	(MK_RBUTTON&wParam) 
+			{
+				
+				vec = gCam->getCamZ();
+				
+				eye = gCam->getEye();
+				
+				
+				eye += vec * (((float) (iMouseY-iZoomMouseY))/50);
+				
+				//if(eye.z > -0.001f) {
+				//	break;
+				//}
+				
+					
+				iZoomMouseY = iMouseY;
+
+				gCam->setEye(eye);
+				//gCam->setTarget(gCubePos); // Set the camera to look at the cube
+				if  (initialized) {
+					Render();
+				}
+						
+			}
+			/**
+				Handle rotation according to the mouse movement only if neither the middle mouse button or
+				right mouse button is not pressed.
+			**/
+			else if(MK_LBUTTON&wParam)
 			{
 				amt = (iMouseX - iZoomMouseX) * kCamMoveAmt * 300;
 				gCam->rotY(((float) amt * 3.14159265f / 180.0f), gCubePos);
@@ -174,25 +208,7 @@ LRESULT CObjectRightView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 					Render();
 				}
 			}
-			else if	(MK_RBUTTON&wParam) 
-			{
-				vec = gCam->getCamZ();
-				eye = gCam->getEye();
-
-				eye += vec * (((float) (iMouseY-iZoomMouseY))/50);
-
-				if	(eye.z > -0.001) {
-					eye.z = -0.001f;
-				}
-				iZoomMouseY = iMouseY;
-
-				gCam->setEye(eye);
-				gCam->setTarget(gCubePos); // Set the camera to look at the cube
-				if  (initialized) {
-					Render();
-				}
-						
-			}
+			
 			break;
 		case ID_RESET_FRONT:
 			m_vecOrigin.x = 0;
@@ -226,6 +242,75 @@ LRESULT CObjectRightView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				Render();
 			}
 			break;
+		
+		case WM_KEYDOWN: //If a Key is down
+			switch(wParam)
+			{
+			case 0x57: //W KEY
+				vec = gCam->getCamZ();
+				
+				eye = gCam->getEye();
+				
+				
+				eye += vec * MULTIPLY_RATIO;
+				
+								
+				iZoomMouseY = iMouseY;
+
+				gCam->setEye(eye);
+				if  (initialized) {
+					Render();
+				}
+				break;
+			case 0x53: // S KEY
+				vec = gCam->getCamZ();
+				
+				eye = gCam->getEye();
+				
+				
+				eye -= vec * MULTIPLY_RATIO;
+				
+				
+					
+				iZoomMouseY = iMouseY;
+
+				gCam->setEye(eye);
+				if  (initialized) {
+					Render();
+				}
+				break;
+			case 0x41:// A KEY
+				vec = gCam->getCamX();
+				eye = gCam->getEye();
+
+				eye -= vec * MULTIPLY_RATIO;
+				gCubePos -=  vec * MULTIPLY_RATIO;
+
+				gCam->setEye(eye);
+				gCam->setTarget(gCubePos); // Set the camera to look at the cube
+				
+				if(initialized)
+					Render();
+				break;
+			
+			case 0x44: // D KEY
+				vec = gCam->getCamX();
+				eye = gCam->getEye();
+
+				eye += vec * MULTIPLY_RATIO;
+				gCubePos +=  vec * MULTIPLY_RATIO; 
+
+				
+
+				gCam->setEye(eye);
+				gCam->setTarget(gCubePos); // Set the camera to look at the cube
+				
+				if(initialized)
+					Render();
+				break;
+			}
+			
+			break;
 		case 7:
 		case 8:
 		case 312:
@@ -246,9 +331,48 @@ LRESULT CObjectRightView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		default:
 			break;
 	}
-
+	
 	return	CFormView::WindowProc(message, wParam, lParam);
 }
+
+/** I have overriden this method to solve the problem of having
+	to use the SetFocus method to set the keyboard input focus to the RightObjectView
+	by pretranslating the message that goes to the MessageProc method(above) to process
+	the WM_KEYDOWN event and sending which key is pressed to the MessageProc method
+**/
+BOOL CObjectRightView::PreTranslateMessage(MSG *pMSG)
+{
+	/* Send a key down event to the message queue*/
+	if(pMSG->message == WM_KEYDOWN) { 
+		
+		if(pMSG->wParam == 0x57)
+			SendMessage(WM_KEYDOWN, 0x57); //Send W key is pressed if the W is pressed 
+		
+		else if( pMSG->wParam ==  0x53)
+			SendMessage(WM_KEYDOWN, 0x53); //Send S key is pressed if the S is pressed 
+		
+		else if( pMSG->wParam == 0x41)
+			SendMessage(WM_KEYDOWN, 0x41); //Send A key is pressed if the A is pressed 
+		
+		else if( pMSG->wParam == 0x44)
+			SendMessage(WM_KEYDOWN, 0x44); //Send D key is pressed if the D is pressed 
+		
+		else if( pMSG->wParam == VK_UP)//If UP-Arrow 
+			SendMessage(WM_KEYDOWN, 0x57); //Send as if W was pressed
+		
+		else if( pMSG->wParam == VK_DOWN)//If Down-Arrow
+			SendMessage(WM_KEYDOWN, 0x53);//Send as if S was pressed
+		
+		else if( pMSG->wParam == VK_LEFT)//If Left-Arrow
+			SendMessage(WM_KEYDOWN, 0x41);//Send as if A was pressed
+		
+		else if( pMSG->wParam == VK_RIGHT)//If Right-Arrow
+			SendMessage(WM_KEYDOWN, 0x44);//Send as if D was pressed
+		}
+		
+	return CView::PreTranslateMessage(pMSG);
+}
+
 
 void CObjectRightView::OnInitialUpdate() 
 {
@@ -274,8 +398,9 @@ void CObjectRightView::OnInitialUpdate()
 		pGroup->SetWindowPos(NULL, 0, 0, m_iWidth, m_iHeight, SWP_NOZORDER);
 
 		InitializeDevice();
-
+		
 		initialized = true;
+		SetFocus();
 	}
 }
 
@@ -457,6 +582,7 @@ void	CObjectRightView::Render()
 			return;
 		}
 	}
+	
 }
 
 int	 CObjectRightView::SetupLights()
@@ -604,5 +730,3 @@ int		CObjectRightView::SetupMatrices()
 
 	return	0;
 }
-
-
