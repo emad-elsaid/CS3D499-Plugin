@@ -21,6 +21,7 @@
 #include "ObjectViewer.h"
 #include "IFCEngineInteract.h"
 #include "cam.h"
+#include "Camera.h"
 
 #include "ObjectRightView.h"
 
@@ -40,6 +41,7 @@ int		DirectXStatus = 0;
 const float kCamMoveAmt = 0.002f; // Amount to move camera by
 const float kMaxAngle = 89.0f;
 D3DXVECTOR3		m_vecOrigin;
+CCamera *g_Camera = new CCamera();
 
 /////////////////////////////////////////////////////////////////////////////
 // CObjectRightView
@@ -58,6 +60,8 @@ CObjectRightView::CObjectRightView()
 
 CObjectRightView::~CObjectRightView()
 {
+	delete g_Camera;
+	g_Camera = NULL;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -103,6 +107,8 @@ LRESULT CObjectRightView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	double	amt;
 	int		iMouseX = LOWORD(lParam),
 			iMouseY = HIWORD(lParam);
+	int		centerX = m_iWidth / 2;
+	int		centerY = m_iHeight / 2;
 	static double pitchAmt = 0.0f;
 	
 	switch  (message)
@@ -119,70 +125,12 @@ LRESULT CObjectRightView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			//	Mouse moved
 			//
 			
-			if	(MK_MBUTTON&wParam) 
-			{
-				//
-				//	Mouse button pressed
-				//
-				vec = gCam->getCamX();
-				eye = gCam->getEye();
-
-				eye -= vec * (((float) (iMouseX-iZoomMouseX))/200);
-				gCubePos -=  vec * (((float) (iMouseX-iZoomMouseX))/200);
-
-				iZoomMouseX = iMouseX;
-
-				gCam->setEye(eye);
-				gCam->setTarget(gCubePos); // Set the camera to look at the cube
-				//
-				vec = gCam->getCamY();
-				eye = gCam->getEye();
-
-				eye += vec * (((float) (iMouseY-iZoomMouseY))/200);
-				gCubePos +=  vec * (((float) (iMouseY-iZoomMouseY))/200);
-
-				iZoomMouseY = iMouseY;
-
-				gCam->setEye(eye);
-				//gCam->setTarget(gCubePos); // Set the camera to look at the cube
-				
-				if  (initialized) {
-					Render();
-				}
-			}
 			
-			else if	(MK_RBUTTON&wParam) 
+			
+			if(MK_LBUTTON&wParam)
 			{
+				/*amt = (iMouseX - iZoomMouseX) * kCamMoveAmt * 300;
 				
-				vec = gCam->getCamZ();
-				
-				eye = gCam->getEye();
-				
-				
-				eye += vec * (((float) (iMouseY-iZoomMouseY))/50);
-				
-				//if(eye.z > -0.001f) {
-				//	break;
-				//}
-				
-					
-				iZoomMouseY = iMouseY;
-
-				gCam->setEye(eye);
-				//gCam->setTarget(gCubePos); // Set the camera to look at the cube
-				if  (initialized) {
-					Render();
-				}
-						
-			}
-			/**
-				Handle rotation according to the mouse movement only if neither the middle mouse button or
-				right mouse button is not pressed.
-			**/
-			else if(MK_LBUTTON&wParam)
-			{
-				amt = (iMouseX - iZoomMouseX) * kCamMoveAmt * 300;
-				gCam->rotY(((float) amt * 3.14159265f / 180.0f), gCubePos);
 				iZoomMouseX = iMouseX;
 
 				amt = -(iMouseY - iZoomMouseY) * kCamMoveAmt * 300;
@@ -202,8 +150,8 @@ LRESULT CObjectRightView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 					pitchAmt += amt;
 				}
 				// Pitch the camera up/down
-				gCam->pitch(((float) amt * 3.14159265f / 180.0f), gCubePos);
-				iZoomMouseY = iMouseY;
+				g_Camera->pitch(((float) amt * 3.14159265f / 180.0f));
+				iZoomMouseY = iMouseY;*/
 				if  (initialized) {
 					Render();
 				}
@@ -211,32 +159,13 @@ LRESULT CObjectRightView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			
 			break;
 		case ID_RESET_FRONT:
-			m_vecOrigin.x = 0;
-			m_vecOrigin.y = 0;
-			m_vecOrigin.z = 0;
-			gCubePos.x = 0;
-			gCubePos.y = 0;
-			gCubePos.z = 0;
-			gCam->setFront(1,
-							  gCubePos.y,
-							  gCubePos.z);
-			gCam->setTarget(gCubePos); // Set the camera to look at the cube
-
+			//TODO:- Reset to the front of model
 			if  (initialized) {
 				Render();
 			}
 			break;
 		case ID_RESET_SIDE:
-			m_vecOrigin.x = 0;
-			m_vecOrigin.y = 0;
-			m_vecOrigin.z = 0;
-			gCubePos.x = 0;
-			gCubePos.y = 0;
-			gCubePos.z = 0;
-			gCam->setSide(1,
-							 gCubePos.y,
-							 gCubePos.z);
-			gCam->setTarget(gCubePos); // Set the camera to look at the cube
+			g_Camera->resetCamera();
 
 			if  (initialized) {
 				Render();
@@ -247,64 +176,52 @@ LRESULT CObjectRightView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			switch(wParam)
 			{
 			case 0x57: //W KEY
-				vec = gCam->getCamZ();
 				
-				eye = gCam->getEye();
-				
-				
-				eye += vec * MULTIPLY_RATIO;
-				
+				g_Camera->walk(MULTIPLY_RATIO);
 								
-				iZoomMouseY = iMouseY;
-
-				gCam->setEye(eye);
 				if  (initialized) {
 					Render();
 				}
 				break;
 			case 0x53: // S KEY
-				vec = gCam->getCamZ();
-				
-				eye = gCam->getEye();
-				
-				
-				eye -= vec * MULTIPLY_RATIO;
-				
-				
-					
-				iZoomMouseY = iMouseY;
-
-				gCam->setEye(eye);
+				g_Camera->walk(-1.0f * MULTIPLY_RATIO);
 				if  (initialized) {
 					Render();
 				}
 				break;
 			case 0x41:// A KEY
-				vec = gCam->getCamX();
-				eye = gCam->getEye();
-
-				eye -= vec * MULTIPLY_RATIO;
-				gCubePos -=  vec * MULTIPLY_RATIO;
-
-				gCam->setEye(eye);
-				gCam->setTarget(gCubePos); // Set the camera to look at the cube
-				
+				g_Camera->strafe(-1.0f * MULTIPLY_RATIO);
 				if(initialized)
 					Render();
 				break;
 			
 			case 0x44: // D KEY
-				vec = gCam->getCamX();
-				eye = gCam->getEye();
+				g_Camera->strafe( MULTIPLY_RATIO );
+				if(initialized)
+					Render();
+				break;
+			
+			case VK_UP:
+				g_Camera->pitch( -1.0f * MULTIPLY_RATIO );
+				if(initialized)
+					Render();
+				break;
+			
+			case VK_DOWN:
+				g_Camera->pitch( MULTIPLY_RATIO );
+				if(initialized)
+					Render();
+				break;
 
-				eye += vec * MULTIPLY_RATIO;
-				gCubePos +=  vec * MULTIPLY_RATIO; 
+			case VK_RIGHT:
+				g_Camera->yaw( MULTIPLY_RATIO );
+				if(initialized)
+					Render();
+				break;
 
 				
-
-				gCam->setEye(eye);
-				gCam->setTarget(gCubePos); // Set the camera to look at the cube
-				
+			case VK_LEFT:
+				g_Camera->yaw( -1.0f * MULTIPLY_RATIO );
 				if(initialized)
 					Render();
 				break;
@@ -358,16 +275,16 @@ BOOL CObjectRightView::PreTranslateMessage(MSG *pMSG)
 			SendMessage(WM_KEYDOWN, 0x44); //Send D key is pressed if the D is pressed 
 		
 		else if( pMSG->wParam == VK_UP)//If UP-Arrow 
-			SendMessage(WM_KEYDOWN, 0x57); //Send as if W was pressed
+			SendMessage(WM_KEYDOWN, VK_UP); //Send as if Up-Arrow
 		
 		else if( pMSG->wParam == VK_DOWN)//If Down-Arrow
-			SendMessage(WM_KEYDOWN, 0x53);//Send as if S was pressed
+			SendMessage(WM_KEYDOWN, VK_DOWN);
 		
 		else if( pMSG->wParam == VK_LEFT)//If Left-Arrow
-			SendMessage(WM_KEYDOWN, 0x41);//Send as if A was pressed
+			SendMessage(WM_KEYDOWN, VK_LEFT);
 		
 		else if( pMSG->wParam == VK_RIGHT)//If Right-Arrow
-			SendMessage(WM_KEYDOWN, 0x44);//Send as if D was pressed
+			SendMessage(WM_KEYDOWN, VK_RIGHT);
 		}
 		
 	return CView::PreTranslateMessage(pMSG);
@@ -428,7 +345,7 @@ void CObjectRightView::InitializeDevice()
 				return;
 			}
 		}
-
+		
 		// Create the D3D object.
 		if( NULL == ( g_pD3D = Direct3DCreate9( D3D_SDK_VERSION ) ) ) {
 			return;
@@ -464,7 +381,8 @@ void CObjectRightView::InitializeDevice()
 				return;
 			}
 		}
-
+		//Set the device that the camera operates on
+		g_Camera->setDevice(g_pd3dDevice);
 		// Turn off culling
 		if( FAILED( g_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE ) ) ) {
 			DirectXStatus = -1;
@@ -690,7 +608,7 @@ int		CObjectRightView::SetupMatrices()
     // eye five units back along the z-axis and up three units, look at the
     // origin, and define "up" to be in the y-direction.
 
-    D3DXVECTOR3 vEyePt(2.0f, 3 * ((float) sin(counter)), 4 * ((float) cos(counter)));
+    /*D3DXVECTOR3 vEyePt(2.0f, 3 * ((float) sin(counter)), 4 * ((float) cos(counter)));
     D3DXVECTOR3 vLookatPt( 0.0f, 0.0f, 0.0f );
     D3DXVECTOR3 vUpVec(0.0f, 1.0f, 0.0f);
     D3DXMATRIX matView;
@@ -698,7 +616,7 @@ int		CObjectRightView::SetupMatrices()
 	if( FAILED( g_pd3dDevice->SetTransform( D3DTS_VIEW, &matView ) ) ) {
 		DirectXStatus = -1;
 		return	1;
-	}
+	}*/
 
     // For the projection matrix, we set up a perspective transform (which
     // transforms geometry from 3D view space to 2D viewport space, with
@@ -716,14 +634,15 @@ int		CObjectRightView::SetupMatrices()
 	D3DXMATRIXA16 matrix;
 
 	// Create "D3D Vector" versions of our camera's eye, look at position, and up vector
-	D3DXVECTOR3 eye(gCam->getEye().z, gCam->getEye().x, gCam->getEye().y);
+	/*D3DXVECTOR3 eye(gCam->getEye().z, gCam->getEye().x, gCam->getEye().y);
 	D3DXVECTOR3 lookAt(gCam->getTarget().z, gCam->getTarget().x, gCam->getTarget().y);
-	D3DXVECTOR3 up(0, 0, 1); // The world's up vector
+	D3DXVECTOR3 up(0, 0, 1); // The world's up vector*/
 
 	// We create a matrix that represents our camera's view of the world.  Notice
 	// the "LH" on the end of the function.  That says, "Hey create this matrix for
 	// a left handed coordinate system".
-	D3DXMatrixLookAtLH(&matrix, &eye, &lookAt, &up);
+	//D3DXMatrixLookAtLH(&matrix, &eye, &lookAt, &up);
+	g_Camera->getViewMatrix(&matrix);
 	if( FAILED( g_pd3dDevice->SetTransform( D3DTS_VIEW, &matrix ) ) ) {
 		DirectXStatus = -1;
 	}

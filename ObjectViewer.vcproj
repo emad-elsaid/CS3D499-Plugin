@@ -145,11 +145,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="&quot;E:\Dev\Microsoft DirectX SDK (August 2009)\Include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="stdafx.h"
 				PrecompiledHeaderFile=".\Debug/ObjectViewer.pch"
 				AssemblerListingLocation=".\Debug/"
@@ -177,7 +178,7 @@
 				OutputFile=".\Debug/ObjectViewer.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="&quot;D:\software\windows binaries\DirectX SDK\Include&quot;;&quot;D:\software\windows binaries\DirectX SDK\Lib\x86&quot;"
+				AdditionalLibraryDirectories="&quot;E:\Dev\Microsoft DirectX SDK (August 2009)\Lib\x86&quot;"
 				IgnoreDefaultLibraryNames="libci.lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/ObjectViewer.pdb"
@@ -237,6 +238,10 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\Camera.cpp"
+				>
 			</File>
 			<File
 				RelativePath="IFCEngineInteract.cpp"
@@ -427,6 +432,10 @@
 			>
 			<File
 				RelativePath="cam.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Camera.h"
 				>
 			</File>
 			<File
