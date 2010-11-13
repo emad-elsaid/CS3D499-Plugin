@@ -1,154 +1,116 @@
+#include "stdafx.h"
 #include "Camera.h"
 
-
-CCamera::CCamera()
+CCamera::CCamera(D3DXVECTOR3 startPos) : m_position(startPos),m_yaw(0),m_pitch(0),m_roll(0)
 {
-	m_vecPosition = D3DXVECTOR3(0.0f, 0.0f, -2.5f); // Position vector
-	m_vecLookAt = D3DXVECTOR3(0.0f, 0.0f, 1.0f); // Look vector
-	m_vecUp = D3DXVECTOR3(0.0f, 1.0f, 0.0f); // Up vector
-	m_vecRight = D3DXVECTOR3(1.0f, 0.0f, 0.0f); // Right vector
-	m_d3ddev = NULL;
+	// Start with an orthagonal camera axis
+	m_up=D3DXVECTOR3(0.0f,1.0f,0.0f);
+	m_look=D3DXVECTOR3(0.0f,0.0f,1.0f);
+	m_right=D3DXVECTOR3(1.0f,0.0f,0.0f);
 }
 
-//------------------------------------------------------------------
-// Name: resetCamera
-// Desc: Reset the camera
-//------------------------------------------------------------------
-void CCamera::resetCamera()
-{
-	m_vecPosition = D3DXVECTOR3(0.0f, 0.0f, -5.0f);
-	m_vecLookAt = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_vecUp = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
-	D3DXMatrixLookAtLH(&m_matView, &m_vecPosition, &m_vecLookAt, &m_vecUp);
-	m_d3ddev->SetTransform(D3DTS_VIEW, &m_matView);
-}
-
-//------------------------------------------------------------------
-// Name: rotateCamera
-// Desc: Rotate the camera to an arbitrary axis
-//------------------------------------------------------------------
-void CCamera::rotateCamera()
+CCamera::~CCamera(void)
 {
 }
 
-//------------------------------------------------------------------
-// Name: walk
-// Desc: Camera for walking
-//------------------------------------------------------------------
-void CCamera::walk(float fUnits)
+void CCamera::CalculateViewMatrix(D3DXMATRIX *viewMatrix)
 {
-	m_vecPosition += m_vecLookAt * fUnits;
+	/* Start with our camera axis pointing down z
+	 An alternative method is to just keep adjusting our axis but if we do that the
+	 axis can start to lose its orthogonal shape (due to floating point innacuracies).
+	 This could be solved by rebuilding the orthogonal shape each time with the following:
+	 1. normalising the look vector
+	 2. creating the up vector from the cross product of the look and the right
+	 3. normalising up
+	 4. creating the right vector from the cross product of the look and the up
+	 5. normalising right
+	*/
+
+	m_up=D3DXVECTOR3(0.0f,1.0f,0.0f);
+	m_look=D3DXVECTOR3(0.0f,0.0f,1.0f);
+	m_right=D3DXVECTOR3(1.0f,0.0f,0.0f);
+
+	// Yaw is rotation around the y axis (m_up)
+	// Create a matrix that can carry out this rotation
+	D3DXMATRIX yawMatrix;
+	D3DXMatrixRotationAxis(&yawMatrix, &m_up, m_yaw);
+	// To apply yaw we rotate the m_look & m_right vectors about the m_up vector (using our yaw matrix)
+	D3DXVec3TransformCoord(&m_look, &m_look, &yawMatrix); 
+	D3DXVec3TransformCoord(&m_right, &m_right, &yawMatrix); 
+
+	// Pitch is rotation around the x axis (m_right)
+	// Create a matrix that can carry out this rotation
+	D3DXMATRIX pitchMatrix;
+	D3DXMatrixRotationAxis(&pitchMatrix, &m_right, m_pitch);
+	// To apply pitch we rotate the m_look and m_up vectors about the m_right vector (using our pitch matrix)
+	D3DXVec3TransformCoord(&m_look, &m_look, &pitchMatrix); 
+	D3DXVec3TransformCoord(&m_up, &m_up, &pitchMatrix); 
+		
+	// Roll is rotation around the z axis (m_look)
+	// Create a matrix that can carry out this rotation
+	D3DXMATRIX rollMatrix;
+	D3DXMatrixRotationAxis(&rollMatrix, &m_look, m_roll);
+	// To apply roll we rotate up and right about the look vector (using our roll matrix)
+	// Note: roll only really applies for things like aircraft unless you are implementing lean
+	D3DXVec3TransformCoord(&m_right, &m_right, &rollMatrix); 
+	D3DXVec3TransformCoord(&m_up, &m_up, &rollMatrix); 
+	
+	// Build the view matrix from the transformed camera axis
+	D3DXMatrixIdentity(viewMatrix);
+
+	viewMatrix->_11 = m_right.z; viewMatrix->_12 = m_up.z; viewMatrix->_13 = m_look.z;
+	viewMatrix->_21 = m_right.x; viewMatrix->_22 = m_up.x; viewMatrix->_23 = m_look.x;
+	viewMatrix->_31 = m_right.y; viewMatrix->_32 = m_up.y; viewMatrix->_33 = m_look.y;
+	
+	viewMatrix->_41 = - D3DXVec3Dot( &m_position,&m_right); 
+	viewMatrix->_42 = - D3DXVec3Dot( &m_position,&m_up);
+	viewMatrix->_43 = - D3DXVec3Dot( &m_position,&m_look);
 }
 
-//------------------------------------------------------------------
-// Name: strafe
-// Desc: Camera for strafing
-//------------------------------------------------------------------
-void CCamera::strafe(float fUnits)
+// Yaw - rotation around y axis
+void CCamera::Yaw(float amount) 
 {
-// Move only on the XZ plane when the camera is on the land
-	m_vecPosition += m_vecRight * fUnits;
+	m_yaw+=amount;
+	m_yaw=RestrictAngleTo360Range(m_yaw);
+}	
+
+// Pitch - rotation around x axis
+void CCamera::Pitch(float amount)
+{
+	m_pitch+=amount;
+	m_pitch=RestrictAngleTo360Range(m_pitch);
 }
 
-//------------------------------------------------------------------
-// Name: fly
-// Desc: Camera for flying
-//------------------------------------------------------------------
-void CCamera::fly(float fUnits)
+// Roll - rotation around z axis
+// Note: normally only used for aircraft type cameras rather than land based ones
+void CCamera::Roll(float amount) 
 {
-// Move only on y-axis when the camera is on the land
-	m_vecPosition += m_vecUp * fUnits;
+	m_roll+=amount;
+	m_roll=RestrictAngleTo360Range(m_roll);
 }
 
-//------------------------------------------------------------------
-// Name: yaw
-// Desc: Camera for yawing
-//------------------------------------------------------------------
-
-void CCamera::yaw(float fAngle)
+void CCamera::rotateCamera(float x, float y)
 {
-	::D3DXMatrixRotationAxis(&m_matView, &m_vecUp, fAngle); // Rotate the up vector
+	if( x != 0)
+	{
+		Pitch(D3DXToRadian(x));
+	}
 
-	// Rotate right and look vectors around y-axis
-	::D3DXVec3TransformCoord(&m_vecRight, &m_vecRight, &m_matView);
-	::D3DXVec3TransformCoord(&m_vecLookAt, &m_vecLookAt, &m_matView);
+	if(y != 0)
+	{
+		Yaw( D3DXToRadian(y) );
+	}
+
 }
 
-//------------------------------------------------------------------
-// Name: roll
-// Desc: Camera for rolling
-//------------------------------------------------------------------
-void CCamera::roll(float fAngle)
+// Keep the angle in the range 0 to 360 (2*PI)
+float CCamera::RestrictAngleTo360Range(float angle) const
 {
-	// Check to see if the camera is on the air
+	while(angle>2*D3DX_PI)
+		angle-=2*D3DX_PI;
 
-	// Rotate the look-at vector by the specified amount
-	::D3DXMatrixRotationAxis(&m_matView, &m_vecLookAt, fAngle);
+	while(angle<0)
+		angle+=2*D3DX_PI;
 
-	// Rotate up and right vectors around look vector
-	::D3DXVec3TransformCoord(&m_vecUp, &m_vecUp, &m_matView);
-	::D3DXVec3TransformCoord(&m_vecRight, &m_vecRight, &m_matView);
-}
-
-//------------------------------------------------------------------
-// Name: pitch
-// Desc: Camera for pitching
-//------------------------------------------------------------------
-void CCamera::pitch(float fAngle)
-{
-	// Rotate around the x-axis
-	::D3DXMatrixRotationAxis(&m_matView, &m_vecRight, fAngle);
-
-	// Rotate up and look vectors around the right vector
-	::D3DXVec3TransformCoord(&m_vecUp, &m_vecUp, &m_matView);
-	::D3DXVec3TransformCoord(&m_vecLookAt, &m_vecLookAt, &m_matView);
-}
-
-//------------------------------------------------------------------
-// Name: zoom
-// Desc: For zooming in and out
-//------------------------------------------------------------------
-void CCamera::zoom(float fUnits)
-{
-	m_vecPosition.z = fUnits;
-}
-
-void CCamera::setDevice(LPDIRECT3DDEVICE9 d3ddev)
-{
-	m_d3ddev = d3ddev;
-	assert(m_d3ddev);
-}
-//------------------------------------------------------------------
-// Name: getViewMatrix
-// Desc: Get the view transformation matrix
-//------------------------------------------------------------------
-D3DXMATRIX *CCamera::getViewMatrix(D3DXMATRIX *pmatView)
-{
-	// Normalize the look-at vector
-	::D3DXVec3Normalize(&m_vecLookAt, &m_vecLookAt);
-
-	// Keep up vector orthogonal to the look and right vectors
-	::D3DXVec3Cross(&m_vecUp, &m_vecLookAt, &m_vecRight);
-
-	// Normalize the up vector
-	::D3DXVec3Normalize(&m_vecUp, &m_vecUp);
-
-	// Keep right vector orthogonal to right and up vectors
-	::D3DXVec3Cross(&m_vecRight, &m_vecUp, &m_vecLookAt);
-
-	// Normalize the right vector
-	::D3DXVec3Normalize(&m_vecRight, &m_vecRight);
-
-	// Build the view matrix
-	m_fX = -::D3DXVec3Dot(&m_vecRight, &m_vecPosition); // X-coordinate
-	m_fY = -::D3DXVec3Dot(&m_vecUp, &m_vecPosition); // Y-coordinate
-	m_fZ = -::D3DXVec3Dot(&m_vecLookAt, &m_vecPosition); // Z-coordinate
-
-	// Modify the values of view transformation matrix
-	(*pmatView)(0, 0) = m_vecRight.z; (*pmatView)(0, 1) = m_vecUp.z; (*pmatView)(0, 2) = m_vecLookAt.z; (*pmatView)(0, 3) = 0.0f;
-	(*pmatView)(1, 0) = m_vecRight.x; (*pmatView)(1, 1) = m_vecUp.x; (*pmatView)(1, 2) = m_vecLookAt.x; (*pmatView)(1, 3) = 0.0f;
-	(*pmatView)(2, 0) = m_vecRight.y; (*pmatView)(2, 1) = m_vecUp.y; (*pmatView)(2, 2) = m_vecLookAt.y; (*pmatView)(2, 3) = 0.0f;
-	(*pmatView)(3, 0) = m_fX; (*pmatView)(3, 1) = m_fY; (*pmatView)(3, 2) = m_fZ; (*pmatView)(3, 3) = 1.0f;
-
-	return pmatView;
+	return angle;
 }

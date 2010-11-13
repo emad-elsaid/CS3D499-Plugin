@@ -20,7 +20,7 @@
 #include "stdafx.h"
 #include "ObjectViewer.h"
 #include "IFCEngineInteract.h"
-#include "cam.h"
+
 #include "Camera.h"
 
 #include "ObjectRightView.h"
@@ -41,7 +41,7 @@ int		DirectXStatus = 0;
 const float kCamMoveAmt = 0.002f; // Amount to move camera by
 const float kMaxAngle = 89.0f;
 D3DXVECTOR3		m_vecOrigin;
-CCamera *g_Camera = new CCamera();
+CCamera *g_Camera = new CCamera(D3DXVECTOR3(0,0,-2.5f));
 
 /////////////////////////////////////////////////////////////////////////////
 // CObjectRightView
@@ -96,20 +96,16 @@ void CObjectRightView::OnSize(UINT nType, int cx, int cy)
 
 
 
-CPos	gCubePos(0,0,0);	// Position of cube in the world
+
 int		iZoomMouseX, iZoomMouseY;
 
 LRESULT CObjectRightView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam) 
 {
-	CVec	vec;	// Used to hold camera's forward vector
-	CPos	eye;	// Used to hold camera's eye
-
-	double	amt;
 	int		iMouseX = LOWORD(lParam),
 			iMouseY = HIWORD(lParam);
-	int		centerX = m_iWidth / 2;
-	int		centerY = m_iHeight / 2;
-	static double pitchAmt = 0.0f;
+
+	FLOAT X = 0, Y = 0;
+	
 	
 	switch  (message)
     {
@@ -125,36 +121,22 @@ LRESULT CObjectRightView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			//	Mouse moved
 			//
 			
-			
-			
 			if(MK_LBUTTON&wParam)
 			{
-				/*amt = (iMouseX - iZoomMouseX) * kCamMoveAmt * 300;
 				
-				iZoomMouseX = iMouseX;
+				SetCapture();
+				SetCursor(NULL);
+				
+				//g_Camera->rotateCamera(30, 0); //TODO: Test this function emad
+				
+				g_Camera->rotateCamera(iMouseY-iZoomMouseY, iMouseX-iZoomMouseX); //TODO: Test this function emad
 
-				amt = -(iMouseY - iZoomMouseY) * kCamMoveAmt * 300;
-				// Cap pitch
-				if(pitchAmt + amt < -kMaxAngle)
-				{
-					amt = -kMaxAngle - pitchAmt;
-					pitchAmt = -kMaxAngle;
-				}
-				else if(pitchAmt + amt > kMaxAngle)
-				{
-					amt = kMaxAngle - pitchAmt;
-					pitchAmt = kMaxAngle;
-				}
-				else
-				{
-					pitchAmt += amt;
-				}
-				// Pitch the camera up/down
-				g_Camera->pitch(((float) amt * 3.14159265f / 180.0f));
-				iZoomMouseY = iMouseY;*/
-				if  (initialized) {
+				if (initialized) {
 					Render();
 				}
+				ReleaseCapture();
+				iZoomMouseX = iMouseX;
+				iZoomMouseY = iMouseY;
 			}
 			
 			break;
@@ -165,7 +147,7 @@ LRESULT CObjectRightView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		case ID_RESET_SIDE:
-			g_Camera->resetCamera();
+			//g_Camera->resetCamera();
 
 			if  (initialized) {
 				Render();
@@ -177,51 +159,51 @@ LRESULT CObjectRightView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			{
 			case 0x57: //W KEY
 				
-				g_Camera->walk(MULTIPLY_RATIO);
+				g_Camera->MoveForward(MULTIPLY_RATIO);
 								
 				if  (initialized) {
 					Render();
 				}
 				break;
 			case 0x53: // S KEY
-				g_Camera->walk(-1.0f * MULTIPLY_RATIO);
+				g_Camera->MoveForward(-1.0f * MULTIPLY_RATIO);
 				if  (initialized) {
 					Render();
 				}
 				break;
 			case 0x41:// A KEY
-				g_Camera->strafe(-1.0f * MULTIPLY_RATIO);
+				g_Camera->MoveRight(-1.0f * MULTIPLY_RATIO);
 				if(initialized)
 					Render();
 				break;
 			
 			case 0x44: // D KEY
-				g_Camera->strafe( MULTIPLY_RATIO );
+				g_Camera->MoveRight( MULTIPLY_RATIO );
 				if(initialized)
 					Render();
 				break;
 			
 			case VK_UP:
-				g_Camera->pitch( -1.0f * MULTIPLY_RATIO );
+				g_Camera->Pitch( -1.0f * MULTIPLY_RATIO );
 				if(initialized)
 					Render();
 				break;
 			
 			case VK_DOWN:
-				g_Camera->pitch( MULTIPLY_RATIO );
+				g_Camera->Pitch( MULTIPLY_RATIO );
 				if(initialized)
 					Render();
 				break;
 
 			case VK_RIGHT:
-				g_Camera->yaw( MULTIPLY_RATIO );
+				g_Camera->Yaw( MULTIPLY_RATIO );
 				if(initialized)
 					Render();
 				break;
 
 				
 			case VK_LEFT:
-				g_Camera->yaw( -1.0f * MULTIPLY_RATIO );
+				g_Camera->Yaw( -1.0f * MULTIPLY_RATIO );
 				if(initialized)
 					Render();
 				break;
@@ -382,7 +364,7 @@ void CObjectRightView::InitializeDevice()
 			}
 		}
 		//Set the device that the camera operates on
-		g_Camera->setDevice(g_pd3dDevice);
+		//g_Camera->setDevice(g_pd3dDevice);
 		// Turn off culling
 		if( FAILED( g_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE ) ) ) {
 			DirectXStatus = -1;
@@ -432,6 +414,7 @@ void CObjectRightView::InitializeDeviceBuffer()
 
 void	CObjectRightView::Render()
 {
+	
 	if	(!DirectXStatus) {
 		// Clear the backbuffer and the zbuffer
 		if( FAILED( g_pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER,
@@ -499,6 +482,8 @@ void	CObjectRightView::Render()
 			DirectXStatus = -1;
 			return;
 		}
+		m_oldCursorPos.x = m_iWidth / 2;
+		m_oldCursorPos.y = m_iHeight / 2;
 	}
 	
 }
@@ -642,7 +627,7 @@ int		CObjectRightView::SetupMatrices()
 	// the "LH" on the end of the function.  That says, "Hey create this matrix for
 	// a left handed coordinate system".
 	//D3DXMatrixLookAtLH(&matrix, &eye, &lookAt, &up);
-	g_Camera->getViewMatrix(&matrix);
+	g_Camera->CalculateViewMatrix(&matrix);
 	if( FAILED( g_pd3dDevice->SetTransform( D3DTS_VIEW, &matrix ) ) ) {
 		DirectXStatus = -1;
 	}

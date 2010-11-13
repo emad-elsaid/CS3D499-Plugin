@@ -8,35 +8,41 @@
 
 
 // CD3DCamera class
-class CCamera {
-public:
-	CCamera(); // Constructor
-
-	void resetCamera(); // Reset the camera
-	void rotateCamera(); // Rotate the camera
-	void walk(float fUnits); // Camera fo walking
-	void strafe(float fUnits); // Camera for strafing
-	void fly(float fUnits); // Camera for flying
-	void yaw(float fAngle); // Camera for yawing
-	void roll(float fAngle); // Camera for rolling
-	void pitch(float fAngle); // Camera for pitching
-	void zoom(float fUnits); // For zooming and out
-	void setDevice(LPDIRECT3DDEVICE9); //Set the D3DDevice
-	D3DXMATRIX *getViewMatrix(D3DXMATRIX *pmatView); // Get view transformation matrix
-
+class CCamera
+{
 private:
-	POINT m_point; // Screen coordinates
+	D3DXVECTOR3 m_position; // camera position
+	float m_yaw;  // rotation around the y axis
+	float m_pitch; // rotation around the x axis
+	float m_roll; // rotation around the z axis
+	D3DXVECTOR3 m_up,m_look,m_right; // camera axis
 
-	D3DXMATRIXA16 m_matView; // View transformation matrix
+	float RestrictAngleTo360Range(float angle) const;
+public:
+	CCamera(D3DXVECTOR3 startPos);
+	~CCamera(void);
 
-	float m_fX, m_fY, m_fZ; // View positions
-	
-	LPDIRECT3DDEVICE9 m_d3ddev;
-	
-	D3DXVECTOR3 m_vecPosition, m_vecUp, m_vecRight, m_vecLookAt; // 3D vectors
+	void CalculateViewMatrix(D3DXMATRIX *viewMatrix);
 
-	
+	// Gets
+	float GetYaw() const {return m_yaw;}
+	float GetPitch() const {return m_pitch;}
+	float GetRoll() const {return m_roll;}
+	D3DXVECTOR3 GetPosition() const {return m_position;}	
+
+	// Move operations
+	void MoveForward(float amount) {m_position+=m_look*amount;}
+	void MoveRight(float amount) {m_position+=m_right*amount;}
+	void MoveUp(float amount) {m_position+=m_up*amount;}
+
+	// Rotations
+	void Yaw(float amount); // rotate around x axis
+	void Pitch(float amount); // rotate around x axis
+	void Roll(float amount); // rotate around z axis	
+
+	void rotateCamera(float x, float y);
 };
+
 
 extern CCamera *g_Camera; // Externed class pointer
 
