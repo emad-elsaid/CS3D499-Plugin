@@ -104,9 +104,6 @@ LRESULT CObjectRightView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	int		iMouseX = LOWORD(lParam),
 			iMouseY = HIWORD(lParam);
 
-	FLOAT X = 0, Y = 0;
-	
-	
 	switch  (message)
     {
 		
@@ -127,9 +124,7 @@ LRESULT CObjectRightView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				SetCapture();
 				SetCursor(NULL);
 				
-				//g_Camera->rotateCamera(30, 0); //TODO: Test this function emad
-				
-				g_Camera->rotateCamera(iMouseY-iZoomMouseY, iMouseX-iZoomMouseX); //TODO: Test this function emad
+				g_Camera->rotateCamera(iMouseY-iZoomMouseY, iMouseX-iZoomMouseX); 
 
 				if (initialized) {
 					Render();
@@ -159,56 +154,30 @@ LRESULT CObjectRightView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			{
 			case 0x57: //W KEY
 				
-				g_Camera->MoveForward(MULTIPLY_RATIO);
+				g_Camera->moveForward(MULTIPLY_RATIO);
 								
 				if  (initialized) {
 					Render();
 				}
 				break;
 			case 0x53: // S KEY
-				g_Camera->MoveForward(-1.0f * MULTIPLY_RATIO);
+				g_Camera->moveForward(-1.0f * MULTIPLY_RATIO);
 				if  (initialized) {
 					Render();
 				}
 				break;
 			case 0x41:// A KEY
-				g_Camera->MoveRight(-1.0f * MULTIPLY_RATIO);
+				g_Camera->moveRight(-1.0f * MULTIPLY_RATIO);
 				if(initialized)
 					Render();
 				break;
 			
 			case 0x44: // D KEY
-				g_Camera->MoveRight( MULTIPLY_RATIO );
-				if(initialized)
-					Render();
-				break;
-			
-			case VK_UP:
-				g_Camera->Pitch( -1.0f * MULTIPLY_RATIO );
-				if(initialized)
-					Render();
-				break;
-			
-			case VK_DOWN:
-				g_Camera->Pitch( MULTIPLY_RATIO );
-				if(initialized)
-					Render();
-				break;
-
-			case VK_RIGHT:
-				g_Camera->Yaw( MULTIPLY_RATIO );
-				if(initialized)
-					Render();
-				break;
-
-				
-			case VK_LEFT:
-				g_Camera->Yaw( -1.0f * MULTIPLY_RATIO );
+				g_Camera->moveRight( MULTIPLY_RATIO );
 				if(initialized)
 					Render();
 				break;
 			}
-			
 			break;
 		case 7:
 		case 8:
@@ -257,16 +226,16 @@ BOOL CObjectRightView::PreTranslateMessage(MSG *pMSG)
 			SendMessage(WM_KEYDOWN, 0x44); //Send D key is pressed if the D is pressed 
 		
 		else if( pMSG->wParam == VK_UP)//If UP-Arrow 
-			SendMessage(WM_KEYDOWN, VK_UP); //Send as if Up-Arrow
+			SendMessage(WM_KEYDOWN, 0x57); //Send as if Up-Arrow
 		
 		else if( pMSG->wParam == VK_DOWN)//If Down-Arrow
-			SendMessage(WM_KEYDOWN, VK_DOWN);
+			SendMessage(WM_KEYDOWN, 0x53);
 		
 		else if( pMSG->wParam == VK_LEFT)//If Left-Arrow
-			SendMessage(WM_KEYDOWN, VK_LEFT);
+			SendMessage(WM_KEYDOWN, 0x41);
 		
 		else if( pMSG->wParam == VK_RIGHT)//If Right-Arrow
-			SendMessage(WM_KEYDOWN, VK_RIGHT);
+			SendMessage(WM_KEYDOWN, 0x44);
 		}
 		
 	return CView::PreTranslateMessage(pMSG);
@@ -482,8 +451,7 @@ void	CObjectRightView::Render()
 			DirectXStatus = -1;
 			return;
 		}
-		m_oldCursorPos.x = m_iWidth / 2;
-		m_oldCursorPos.y = m_iHeight / 2;
+		
 	}
 	
 }
@@ -588,20 +556,6 @@ int		CObjectRightView::SetupMatrices()
 		return	1;
 	}
 
-    // Set up our view matrix. A view matrix can be defined given an eye point,
-    // a point to lookat, and a direction for which way is up. Here, we set the
-    // eye five units back along the z-axis and up three units, look at the
-    // origin, and define "up" to be in the y-direction.
-
-    /*D3DXVECTOR3 vEyePt(2.0f, 3 * ((float) sin(counter)), 4 * ((float) cos(counter)));
-    D3DXVECTOR3 vLookatPt( 0.0f, 0.0f, 0.0f );
-    D3DXVECTOR3 vUpVec(0.0f, 1.0f, 0.0f);
-    D3DXMATRIX matView;
-    D3DXMatrixLookAtLH( &matView, &vEyePt, &vLookatPt, &vUpVec );
-	if( FAILED( g_pd3dDevice->SetTransform( D3DTS_VIEW, &matView ) ) ) {
-		DirectXStatus = -1;
-		return	1;
-	}*/
 
     // For the projection matrix, we set up a perspective transform (which
     // transforms geometry from 3D view space to 2D viewport space, with
@@ -617,17 +571,9 @@ int		CObjectRightView::SetupMatrices()
 	}
 
 	D3DXMATRIXA16 matrix;
-
-	// Create "D3D Vector" versions of our camera's eye, look at position, and up vector
-	/*D3DXVECTOR3 eye(gCam->getEye().z, gCam->getEye().x, gCam->getEye().y);
-	D3DXVECTOR3 lookAt(gCam->getTarget().z, gCam->getTarget().x, gCam->getTarget().y);
-	D3DXVECTOR3 up(0, 0, 1); // The world's up vector*/
-
-	// We create a matrix that represents our camera's view of the world.  Notice
-	// the "LH" on the end of the function.  That says, "Hey create this matrix for
-	// a left handed coordinate system".
-	//D3DXMatrixLookAtLH(&matrix, &eye, &lookAt, &up);
-	g_Camera->CalculateViewMatrix(&matrix);
+	//Calculate the new view matrix for the camera
+	g_Camera->calculateViewMatrix(&matrix);
+	
 	if( FAILED( g_pd3dDevice->SetTransform( D3DTS_VIEW, &matrix ) ) ) {
 		DirectXStatus = -1;
 	}

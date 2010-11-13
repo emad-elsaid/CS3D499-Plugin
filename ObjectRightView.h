@@ -89,7 +89,7 @@ protected:
 	int		m_iWidth;
 	int		m_iHeight;
 	
-	POINT	m_oldCursorPos;
+	
 	
 	void	InitializeDevice();
 	void	InitializeDeviceBuffer();

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Camera.h"
 
-CCamera::CCamera(D3DXVECTOR3 startPos) : m_position(startPos),m_yaw(0),m_pitch(0),m_roll(0)
+CCamera::CCamera(D3DXVECTOR3 startPos) : m_position(startPos),m_yaw(0),m_pitch(0)
 {
 	// Start with an orthagonal camera axis
 	m_up=D3DXVECTOR3(0.0f,1.0f,0.0f);
@@ -13,7 +13,7 @@ CCamera::~CCamera(void)
 {
 }
 
-void CCamera::CalculateViewMatrix(D3DXMATRIX *viewMatrix)
+void CCamera::calculateViewMatrix(D3DXMATRIX *viewMatrix)
 {
 	/* Start with our camera axis pointing down z
 	 An alternative method is to just keep adjusting our axis but if we do that the
@@ -48,12 +48,6 @@ void CCamera::CalculateViewMatrix(D3DXMATRIX *viewMatrix)
 		
 	// Roll is rotation around the z axis (m_look)
 	// Create a matrix that can carry out this rotation
-	D3DXMATRIX rollMatrix;
-	D3DXMatrixRotationAxis(&rollMatrix, &m_look, m_roll);
-	// To apply roll we rotate up and right about the look vector (using our roll matrix)
-	// Note: roll only really applies for things like aircraft unless you are implementing lean
-	D3DXVec3TransformCoord(&m_right, &m_right, &rollMatrix); 
-	D3DXVec3TransformCoord(&m_up, &m_up, &rollMatrix); 
 	
 	// Build the view matrix from the transformed camera axis
 	D3DXMatrixIdentity(viewMatrix);
@@ -68,43 +62,37 @@ void CCamera::CalculateViewMatrix(D3DXMATRIX *viewMatrix)
 }
 
 // Yaw - rotation around y axis
-void CCamera::Yaw(float amount) 
+void CCamera::yaw(float amount) 
 {
 	m_yaw+=amount;
-	m_yaw=RestrictAngleTo360Range(m_yaw);
+	m_yaw=restrictAngleTo360Range(m_yaw);
 }	
 
 // Pitch - rotation around x axis
-void CCamera::Pitch(float amount)
+void CCamera::pitch(float amount)
 {
 	m_pitch+=amount;
-	m_pitch=RestrictAngleTo360Range(m_pitch);
+	m_pitch=restrictAngleTo360Range(m_pitch);
 }
 
-// Roll - rotation around z axis
-// Note: normally only used for aircraft type cameras rather than land based ones
-void CCamera::Roll(float amount) 
-{
-	m_roll+=amount;
-	m_roll=RestrictAngleTo360Range(m_roll);
-}
+
 
 void CCamera::rotateCamera(float x, float y)
 {
 	if( x != 0)
 	{
-		Pitch(D3DXToRadian(x));
+		pitch(D3DXToRadian(x));
 	}
 
 	if(y != 0)
 	{
-		Yaw( D3DXToRadian(y) );
+		yaw( D3DXToRadian(y) );
 	}
 
 }
 
 // Keep the angle in the range 0 to 360 (2*PI)
-float CCamera::RestrictAngleTo360Range(float angle) const
+float CCamera::restrictAngleTo360Range(float angle) const
 {
 	while(angle>2*D3DX_PI)
 		angle-=2*D3DX_PI;
