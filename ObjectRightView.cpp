@@ -226,16 +226,16 @@ BOOL CObjectRightView::PreTranslateMessage(MSG *pMSG)
 			SendMessage(WM_KEYDOWN, 0x44); //Send D key is pressed if the D is pressed 
 		
 		else if( pMSG->wParam == VK_UP)//If UP-Arrow 
-			SendMessage(WM_KEYDOWN, 0x57); //Send as if Up-Arrow
+			SendMessage(WM_KEYDOWN, 0x57); //Send as if W
 		
 		else if( pMSG->wParam == VK_DOWN)//If Down-Arrow
-			SendMessage(WM_KEYDOWN, 0x53);
+			SendMessage(WM_KEYDOWN, 0x53); //Send as if S
 		
 		else if( pMSG->wParam == VK_LEFT)//If Left-Arrow
-			SendMessage(WM_KEYDOWN, 0x41);
+			SendMessage(WM_KEYDOWN, 0x41); //Send as if A
 		
 		else if( pMSG->wParam == VK_RIGHT)//If Right-Arrow
-			SendMessage(WM_KEYDOWN, 0x44);
+			SendMessage(WM_KEYDOWN, 0x44); //Send as if D
 		}
 		
 	return CView::PreTranslateMessage(pMSG);
@@ -311,8 +311,16 @@ void CObjectRightView::InitializeDevice()
 			DirectXStatus = -1;
 			return;
 		}
+		DWORD quality;
 
 		ZeroMemory( &d3dpp, sizeof(d3dpp) );
+		//Check for hardware antialiasing capabilities
+		if (SUCCEEDED( g_pD3D->CheckDeviceMultiSampleType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, TRUE, D3DMULTISAMPLE_NONMASKABLE, &quality) )) {
+			
+			d3dpp.MultiSampleType = D3DMULTISAMPLE_NONMASKABLE;
+			d3dpp.MultiSampleQuality = quality - 1;
+		
+		}
 		d3dpp.Windowed = TRUE;
 		d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
 		d3dpp.BackBufferFormat = d3ddm.Format;
@@ -336,6 +344,11 @@ void CObjectRightView::InitializeDevice()
 		//g_Camera->setDevice(g_pd3dDevice);
 		// Turn off culling
 		if( FAILED( g_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE ) ) ) {
+			DirectXStatus = -1;
+			return;
+		}
+		
+		if( FAILED( g_pd3dDevice->SetRenderState( D3DRS_MULTISAMPLEANTIALIAS, TRUE) ) ) {
 			DirectXStatus = -1;
 			return;
 		}
