@@ -107,9 +107,9 @@ BOOL CObjectApp::InitApplication()
 
 	ASSERT(ifcSchemaName == NULL  &&  i > 0);
 	
-	ifcSchemaName = new char[i+strlen("IFC2X3_TC1.exp")+1];
+	ifcSchemaName = new char[i+strlen("IFC2X3.exp")+1];
 	memcpy(&ifcSchemaName[0], this->m_pszHelpFilePath, i);
-	memcpy(&ifcSchemaName[i], "IFC2X3_TC1.exp", strlen("IFC2X3_TC1.exp")+1);
+	memcpy(&ifcSchemaName[i], "IFC2X3.exp", strlen("IFC2X3.exp")+1);
 	
 	return	CWinApp::InitApplication();
 }
