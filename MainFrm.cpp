@@ -33,9 +33,6 @@ IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 
 BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_CREATE()
-	ON_COMMAND(ID_3DVIEW_RESETSIDE, On3dviewResetside)
-	ON_COMMAND(ID_3DVIEW_RESETTOP, On3dviewResettop)
-	ON_COMMAND(ID_3DVIEW_RESETFRONT, On3dviewResetfront)
 END_MESSAGE_MAP()
 
 extern	int	render_browse_type;
@@ -91,29 +88,3 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 	return	true;
 }
 
-void CMainFrame::On3dviewResetside() 
-{
-	CWnd * wnd = this;
-	wnd = wnd->GetWindow(GW_CHILD);
-	wnd = wnd->GetWindow(GW_CHILD);
-	wnd = wnd->GetNextWindow();
-	wnd->SendMessage(ID_RESET_SIDE, 0, 0);
-}
-
-void CMainFrame::On3dviewResettop() 
-{
-	CWnd * wnd = this;
-	wnd = wnd->GetWindow(GW_CHILD);
-	wnd = wnd->GetWindow(GW_CHILD);
-	wnd = wnd->GetNextWindow();
-	wnd->SendMessage(ID_RESET_TOP, 0, 0);
-}
-
-void CMainFrame::On3dviewResetfront() 
-{
-	CWnd * wnd = this;
-	wnd = wnd->GetWindow(GW_CHILD);
-	wnd = wnd->GetWindow(GW_CHILD);
-	wnd = wnd->GetNextWindow();
-	wnd->SendMessage(ID_RESET_FRONT, 0, 0);
-}

@@ -50,9 +50,6 @@ public:
 // Generated message map functions
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-	afx_msg void On3dviewResetside();
-	afx_msg void On3dviewResettop();
-	afx_msg void On3dviewResetfront();
 	DECLARE_MESSAGE_MAP()
 };
 

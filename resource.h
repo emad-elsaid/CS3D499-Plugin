@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by ObjectViewer.rc
 //
 #define IDD_ABOUTBOX                    100
@@ -18,6 +18,7 @@
 #define ID_3DVIEW_RESETFRONT            32776
 #define ID_FILE_SAVEASIFC               32777
 #define ID_FILE_SAVEASIFCXML            32778
+#define ID_ACCELERATOR32780             32780
 #define ID_UPDATE_RIGHT_VIEW            61204
 #define ID_INIT_RIGHT_VIEW              61205
 #define ID_RESET_TOP                    61209
@@ -29,7 +30,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        134
-#define _APS_NEXT_COMMAND_VALUE         32779
+#define _APS_NEXT_COMMAND_VALUE         32782
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

@@ -118,7 +118,7 @@ LRESULT CObjectRightView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				SetCapture();
 				SetCursor(NULL);
 				
-				g_Camera->rotateCamera(iMouseY-iZoomMouseY, iMouseX-iZoomMouseX); 
+				g_Camera->rotateCamera((float)(iMouseY-iZoomMouseY), (float)(iMouseX-iZoomMouseX)); 
 
 				if (initialized) {
 					Render();
@@ -394,7 +394,7 @@ void	CObjectRightView::Render()
 	if	(!DirectXStatus) {
 		// Clear the backbuffer and the zbuffer
 		if( FAILED( g_pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER,
-										 D3DCOLOR_XRGB(0,0,255), 1.0f, 0 ) ) ) {
+										 D3DCOLOR_XRGB(142,208,240), 1.0f, 0 ) ) ) {
 			DirectXStatus = -1;
 			return;
 		}
@@ -425,13 +425,13 @@ void	CObjectRightView::Render()
 
 
 			D3DMATERIAL9	mtrl;
-			mtrl.Diffuse.r = mtrl.Ambient.r = mtrl.Specular.r = 0.4f;
-			mtrl.Diffuse.g = mtrl.Ambient.g = mtrl.Specular.g = 0.1f;
-			mtrl.Diffuse.b = mtrl.Ambient.b = mtrl.Specular.b = 0.7f;
+			mtrl.Diffuse.r = mtrl.Ambient.r = mtrl.Specular.r = 0.3f;
+			mtrl.Diffuse.g = mtrl.Ambient.g = mtrl.Specular.g = 0.3f;
+			mtrl.Diffuse.b = mtrl.Ambient.b = mtrl.Specular.b = 0.3f;
 			mtrl.Diffuse.a = mtrl.Ambient.a = mtrl.Specular.a = 1.0f;
-			mtrl.Emissive.r = 0.1f;
-			mtrl.Emissive.g = 0.4f;
-			mtrl.Emissive.b = 0.02f;
+			mtrl.Emissive.r = 0.0f;
+			mtrl.Emissive.g = 0.0f;
+			mtrl.Emissive.b = 0.0f;
 			mtrl.Emissive.a = 0.5f;
 
 			g_pd3dDevice->SetMaterial(&mtrl);
@@ -465,7 +465,6 @@ void	CObjectRightView::Render()
 
 int	 CObjectRightView::SetupLights()
 {
-	float	max = 1;
     // Set up a white, directional light, with an oscillating direction.
     // Note that many lights may be active at a time (but each one slows down
     // the rendering of our scene). However, here we are just using one. Also,
