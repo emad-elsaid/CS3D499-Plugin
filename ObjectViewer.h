@@ -46,7 +46,6 @@ public:
 	virtual BOOL InitApplication();
 
 // Implementation
-	afx_msg void OnAppAbout();
 	DECLARE_MESSAGE_MAP()
 };
 

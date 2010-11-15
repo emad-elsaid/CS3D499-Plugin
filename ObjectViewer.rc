@@ -46,10 +46,6 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "E&xit",                       ID_APP_EXIT
     END
-    POPUP "&Help"
-    BEGIN
-        MENUITEM "&About ObjectViewer...",      ID_APP_ABOUT
-    END
 END
 
 
@@ -73,24 +69,6 @@ BEGIN
     "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL, NOINVERT
     VK_F6,          ID_NEXT_PANE,           VIRTKEY, NOINVERT
     VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT, NOINVERT
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
-IDD_ABOUTBOX DIALOG  0, 0, 261, 55
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "About ObjectViewer"
-FONT 8, "MS Sans Serif"
-BEGIN
-    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
-    LTEXT           "ObjectViewer free example software",IDC_STATIC,40,10,119,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2005",IDC_STATIC,40,39,119,8
-    DEFPUSHBUTTON   "OK",IDOK,204,7,50,14,WS_GROUP
-    LTEXT           "IFC interface based on IFC Engine DLL (http://www.ifcengine.com)",IDC_STATIC,40,25,207,8,SS_NOPREFIX
 END
 
 
@@ -134,25 +112,6 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
-BEGIN
-    IDD_ABOUTBOX, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 254
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 48
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // String Table
 //
 
@@ -188,7 +147,6 @@ END
 
 STRINGTABLE 
 BEGIN
-    ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
     ID_APP_EXIT             "Quit the application; prompts to save documents\nExit"
 END
 

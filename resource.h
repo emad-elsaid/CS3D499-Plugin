@@ -2,7 +2,6 @@
 // Microsoft Visual C++ generated include file.
 // Used by ObjectViewer.rc
 //
-#define IDD_ABOUTBOX                    100
 #define IDR_MAINFRAME                   128
 #define IDR_OBJECTTYPE                  129
 #define IDB_BITMAP_UNCHECKED            130
@@ -18,7 +17,6 @@
 #define ID_3DVIEW_RESETFRONT            32776
 #define ID_FILE_SAVEASIFC               32777
 #define ID_FILE_SAVEASIFCXML            32778
-#define ID_ACCELERATOR32780             32780
 #define ID_UPDATE_RIGHT_VIEW            61204
 #define ID_INIT_RIGHT_VIEW              61205
 #define ID_RESET_TOP                    61209

@@ -34,7 +34,6 @@ extern  int     model;
 // CObjectApp
 
 BEGIN_MESSAGE_MAP(CObjectApp, CWinApp)
-	ON_COMMAND(ID_APP_ABOUT, OnAppAbout)
 	ON_COMMAND(ID_FILE_NEW, CWinApp::OnFileNew)
 	ON_COMMAND(ID_FILE_OPEN, CWinApp::OnFileOpen)
 END_MESSAGE_MAP()
@@ -97,46 +96,6 @@ BOOL CObjectApp::InitInstance()
 	return TRUE;
 }
 
-
-/////////////////////////////////////////////////////////////////////////////
-// CAboutDlg dialog used for App About
-
-class CAboutDlg : public CDialog
-{
-public:
-	CAboutDlg();
-
-// Dialog Data
-	enum { IDD = IDD_ABOUTBOX };
-
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
-// Implementation
-protected:
-		// No message handlers
-	DECLARE_MESSAGE_MAP()
-};
-
-CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD)
-{
-}
-
-void CAboutDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialog::DoDataExchange(pDX);
-}
-
-BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
-	// No message handlers
-END_MESSAGE_MAP()
-
-// App command to run the dialog
-void CObjectApp::OnAppAbout()
-{
-	CAboutDlg aboutDlg;
-	aboutDlg.DoModal();
-}
 
 /////////////////////////////////////////////////////////////////////////////
 // CObjectApp message handlers
