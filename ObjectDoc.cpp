@@ -23,12 +23,6 @@
 
 #include "ObjectDoc.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 extern	STRUCT_INSTANCES	* first_instance;
 extern	char	* ifcSchemaName;
 
@@ -95,21 +89,3 @@ void CObjectDoc::Serialize(CArchive& ar)
 		}
 	}
 }
-
-/////////////////////////////////////////////////////////////////////////////
-// CObjectDoc diagnostics
-
-#ifdef _DEBUG
-void CObjectDoc::AssertValid() const
-{
-	CDocument::AssertValid();
-}
-
-void CObjectDoc::Dump(CDumpContext& dc) const
-{
-	CDocument::Dump(dc);
-}
-#endif //_DEBUG
-
-/////////////////////////////////////////////////////////////////////////////
-// CObjectDoc commands

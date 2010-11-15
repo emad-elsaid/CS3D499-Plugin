@@ -46,10 +46,6 @@ public:
 // Implementation
 public:
 	virtual ~CObjectLeftView();
-#ifdef _DEBUG
-	virtual void AssertValid() const;
-	virtual void Dump(CDumpContext& dc) const;
-#endif
 
 protected:
 
@@ -59,9 +55,9 @@ protected:
 	DECLARE_MESSAGE_MAP()
 };
 
-#ifndef _DEBUG  // debug version in ObjectLeftView.cpp
 inline CObjectDoc* CObjectLeftView::GetDocument()
-   { return (CObjectDoc*)m_pDocument; }
-#endif
+{ 
+	return (CObjectDoc*)m_pDocument;
+}
 
 #endif

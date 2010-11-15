@@ -25,11 +25,6 @@
 
 #include "MainFrm.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
 
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame
@@ -74,21 +69,6 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	return TRUE;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// CMainFrame diagnostics
-
-#ifdef _DEBUG
-void CMainFrame::AssertValid() const
-{
-	CFrameWnd::AssertValid();
-}
-
-void CMainFrame::Dump(CDumpContext& dc) const
-{
-	CFrameWnd::Dump(dc);
-}
-
-#endif //_DEBUG
 
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame message handlers

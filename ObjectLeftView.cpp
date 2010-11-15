@@ -24,12 +24,6 @@
 #include "ObjectDoc.h"
 #include "ObjectLeftView.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 extern	STRUCT_INSTANCES	* first_instance;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -69,27 +63,6 @@ void CObjectLeftView::OnDraw(CDC* pDC)
 	ASSERT_VALID(pDoc);
 	// TODO: add draw code for native data here
 }
-
-/////////////////////////////////////////////////////////////////////////////
-// CObjectLeftView diagnostics
-
-#ifdef _DEBUG
-void CObjectLeftView::AssertValid() const
-{
-	CTreeView::AssertValid();
-}
-
-void CObjectLeftView::Dump(CDumpContext& dc) const
-{
-	CTreeView::Dump(dc);
-}
-
-CObjectDoc* CObjectLeftView::GetDocument() // non-debug version is inline
-{
-	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CObjectDoc)));
-	return (CObjectDoc*)m_pDocument;
-}
-#endif //_DEBUG
 
 /////////////////////////////////////////////////////////////////////////////
 // CObjectLeftView message handlers
